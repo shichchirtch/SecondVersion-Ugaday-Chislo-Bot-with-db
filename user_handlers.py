@@ -30,9 +30,6 @@ async def process_positive_answer(message: Message):
     user_tg_id = message.from_user.id
     choosing_number(general, user_tg_id)
     print('choosing_number works')
-    # create_temp_table(user_tg_id)
-    # REFRESH_game_table()
-
     INSERT_IN_GAME_TABLE(one_game, user_tg_id)
     await message.answer(text="Я загадал число, начинайте угадывать !",
                          reply_markup=ReplyKeyboardRemove())
@@ -100,14 +97,11 @@ async def process_numbers_answer(message: Message):
 
             user_lost(general, user_tg_id)
             drop_temp_table('game')
-            # one_game.drop(engine)
-            # REFRESH_game_table()
-
 
             await message.answer(language_dict['unf']+
                                  user_name +
                                  language_dict['no att lost'] +
-                                 str(get_secret_number(general, user_tg_id)),
+                                 str(secret_number),
                                  reply_markup=keyboard_after_fail)
             time.sleep(1)
 

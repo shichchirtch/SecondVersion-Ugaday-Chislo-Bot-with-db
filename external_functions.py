@@ -32,10 +32,6 @@ def cancel_update(table: db.Table, user_tg_id: int):
     conn.execute(update_query)
     conn.commit()
 
-# def drop_table(table_name:str='game')->None:
-#     sql = text(f'DROP TABLE IF EXISTS {table_name};')
-#     conn.execute(sql)
-#     conn.commit()
 
 def choosing_number(table: db.Table, user_tg_id: int):
     update_query = (db.update(table).where(table.columns.id == user_tg_id).values(in_game=1,

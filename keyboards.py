@@ -42,7 +42,7 @@ keyboard_after_fail = ReplyKeyboardMarkup(
     keyboard=[[start_button_1, start_button_2]],
     resize_keyboard=True)
 
-#создаю клавиатуру с одной с кнопками Да и Узнать счет.
+#создаю клавиатуру с одной с кнопкой Да.
 keyboard_after_saying_NO = ReplyKeyboardMarkup(
     keyboard=[[start_button_1]],
     resize_keyboard=True)

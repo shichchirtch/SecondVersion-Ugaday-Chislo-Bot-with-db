@@ -44,9 +44,10 @@ async def process_cancel_command(message: Message):
         if verify_INGAME_status(general, user_tg_id):
             cancel_update(general, user_tg_id)
             drop_temp_table('game')
-            await message.answer(language_dict['exit from game'])
+            await message.answer(language_dict['exit from game'],
+                                 reply_markup=keyboard_after_saying_NO)
         else:
             await message.answer(text=language_dict['user not in game now'],
-                                 reply_markup=keyboard1)
+                                 reply_markup=keyboard_after_saying_NO)
     else:
         await message.answer(language_dict['if not start'])
