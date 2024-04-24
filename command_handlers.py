@@ -1,71 +1,52 @@
 from aiogram import Router
-from filters import *
 from aiogram.filters import Command, CommandStart
 from keyboards import *
-from lexicon import start_greeding
-from loggers import *
-from aiogram.types import CallbackQuery, Message
-from bot_base import db, add_user
-import sqlite3, aiosqlite
+from lexicon import start_greeding, language_dict
+from aiogram.types import Message
 
-command_router = Router()
+from bot_base import general
+from external_functions import (insert_new_user_in_ganeral_table, verify_that_user_into_general,
+                                verify_INGAME_status, cancel_update)
 
-
-import time
-
+from temp_table import drop_temp_table
 
 # Инициализируем роутер уровня модуля
-Comand_router = Router()
+command_router = Router()
 
 @command_router.message(CommandStart())
 async def process_start_command(message: Message):
     # Логируем старт Бота
     print(f'user {message.chat.first_name} press start')
     user_name = message.chat.first_name
-
-
-    # # start_time = time.monotonic()
-    in_game = 0
-    # secret_number = None
-    # attempts = 5
-    # total_games = 0
-    # wins = 0
-    # total = 5
-    # game_list = 'empty'
-    # bot_list = 'empty'
-    # set_attempts= 'NotSet'
-    # user_number = 'setting_data'
-    # bot_taily =  'empty'
-    # bot_win = 0
-    # bot_pobeda = 0
-    # start_time = None
-    # await add_user(message.from_user.id,
-    #                user_name,
-    #                in_game,
-    #                secret_number,
-    #                attempts,
-    #                total_games,
-    #                wins,
-    #                total,
-    #                game_list,
-    #                bot_list,
-    #                set_attempts,
-    #                user_number,
-    #                bot_taily,
-    #                bot_win,
-    #                bot_pobeda,
-    #                start_time )
-
-    await add_user(message.from_user.id,
-                   user_name,
-                   in_game)
-    print(message.from_user.id)
+    user_tg_id = message.from_user.id
+    insert_new_user_in_ganeral_table(general, user_tg_id, user_name)
     await message.answer(
-        f'Привет, {message.chat.first_name} !  \U0001F60A\n {start_greeding}')
-    time.sleep(1)
-    await message.answer(text='Если хотите установить количество попыток введите число от 1\uFE0F\u20E3 до \U0001f51f\n'
-                         'По умолчанию у вас 5\uFE0F\u20E3  попыток',
-                         reply_markup=keyboard_attempts)
-    std_out_logger.info(f'\nБот запустил {message.chat.first_name}')# print('Only print, when new User start bot') log
-    # std_err_logger.info(f'\nСтруктура словаря юзера {users[message.from_user.id]["user_name"]} = {users[message.from_user.id]} ')
-    # logger.warning(f'Структура словаря users =  {users}')# pprint(users) # log
+        f'Привет, {message.chat.first_name} !  \U0001F60A\n {start_greeding}',
+                    reply_markup=keyboard1)
+    print("Process finfshed")
+
+
+@command_router.message(Command(commands='help'))
+async def process_help_command(message: Message):
+    user_tg_id = message.from_user.id
+    user_name = message.chat.first_name
+    if verify_that_user_into_general(general, user_tg_id):
+        await message.answer(text=language_dict['game rules']+ user_name + language_dict['start ?'],
+                             reply_markup=keyboard_for_help)
+    else:
+        await message.answer('Для начала работы с ботом введите /start')
+
+
+@command_router.message(Command(commands='cancel'))
+async def process_cancel_command(message: Message):
+    user_tg_id = message.from_user.id
+    if verify_that_user_into_general(general, user_tg_id):
+        if verify_INGAME_status(general, user_tg_id):
+            cancel_update(general, user_tg_id)
+            drop_temp_table('game')
+            await message.answer(language_dict['exit from game'])
+        else:
+            await message.answer(text=language_dict['user not in game now'],
+                                 reply_markup=keyboard1)
+    else:
+        await message.answer(language_dict['if not start'])

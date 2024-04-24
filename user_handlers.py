@@ -1,21 +1,130 @@
 from aiogram import Router, F
 from filters import *
 from keyboards import *
-from lexicon import LEXICON, positiv_answer, language_dict
-from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
-import aiosqlite
+from lexicon import positiv_answer, language_dict, negative_answer
+from aiogram.types import  Message, ReplyKeyboardRemove, ContentType
+from external_functions import (verify_INGAME_status, choosing_number,
+                                verify_that_user_into_general, get_secret_number,
+                                update_after_user_wins, minus_one_attempt,
+                                check_attempts_lost_number, user_lost)
+from temp_table import (insert_user_number_in_one_game_table, drop_temp_table,
+                        check_user_number, INSERT_IN_GAME_TABLE, REFRESH_game_table)
+
+from bot_base import general,  engine, one_game
+import time
+
+
 user_router = Router()
+@user_router.message(F.content_type != ContentType.TEXT)
+async def process_notTEXT_answers(message: Message):
+    user_tg_id = message.from_user.id
+    user_name = message.chat.first_name
+    if verify_INGAME_status(general, user_tg_id):
+        await message.answer(language_dict['wrong sent data'])
+    else:
+        await message.answer(user_name + language_dict['wrong content type'])
 
 @user_router.message(DATA_IS_NOT_DIGIT(), F.text.lower().in_(positiv_answer))
 async def process_positive_answer(message: Message):
-    userID = message.from_user.id
-    # Устанавливаем соединение с базой данных
-    connect = await aiosqlite.connect('mybase7.db')
-    cursor = await connect.cursor()
-    # Обновляем game status
-    await cursor.execute('UPDATE users SET in_game = ? WHERE user_id = ?', (1, f'{userID}'))
-    # Сохраняем изменения и закрываем соединение
-    await connect.commit()
-    await connect.close()
-    await message.answer(language_dict['new number'],
-                             reply_markup=ReplyKeyboardRemove())
+    print("posetive works")
+    user_tg_id = message.from_user.id
+    choosing_number(general, user_tg_id)
+    print('choosing_number works')
+    # create_temp_table(user_tg_id)
+    # REFRESH_game_table()
+
+    INSERT_IN_GAME_TABLE(one_game, user_tg_id)
+    await message.answer(text="Я загадал число, начинайте угадывать !",
+                         reply_markup=ReplyKeyboardRemove())
+
+
+
+
+# Этот хэндлер будет срабатывать на отказ пользователя сыграть в игру
+@user_router.message(F.text.lower().in_(negative_answer))
+async def process_negative_answer(message: Message):
+    user_tg_id = message.from_user.id
+    print(f'Юзер ответил нет !')
+    if not verify_INGAME_status(general, user_tg_id):
+        await message.answer(text=language_dict['pity'],
+                             reply_markup=keyboard_after_saying_NO)
+    else:
+        await message.answer(language_dict['wrong sent data'])
+
+
+@user_router.message(lambda x: x.text and x.text.isdigit() and 1 <= int(x.text) <= 100)
+async def process_numbers_answer(message: Message):
+    user_tg_id = message.from_user.id
+    user_name = message.chat.first_name
+    secret_number = get_secret_number(general, user_tg_id)
+    if verify_INGAME_status(general, user_tg_id):
+        print('\n\n\ntest chech')
+        if int(message.text) == secret_number:
+            update_after_user_wins(general, user_tg_id)
+            drop_temp_table('game')
+            await message.answer(language_dict['wow'] +
+                                 user_name +
+                                 language_dict['user guessed'] +
+                                 str(get_secret_number(general, user_tg_id)))
+            await message.answer(text=
+                                 language_dict['play new game after user wins'],
+                                 reply_markup=keyboard1)
+
+        elif int(message.text) > secret_number:
+            if not check_user_number(one_game, int(message.text)):
+                minus_one_attempt(general, user_tg_id)
+                insert_user_number_in_one_game_table(one_game, user_tg_id, int(message.text))
+
+                print(f'1 game_list=  \n\n ')
+
+                await message.answer(language_dict['less'])
+            else:
+                await message.answer(language_dict['dont repeat your number'])
+
+        elif int(message.text) < secret_number:
+            if not check_user_number(one_game, int(message.text)):
+                minus_one_attempt(general, user_tg_id)
+                insert_user_number_in_one_game_table(one_game, user_tg_id,  int(message.text))
+
+                print(f'1 game_list=  \n\n ')
+
+                await message.answer(language_dict['more'])
+            else:
+                await message.answer(language_dict['dont repeat your number'])
+
+        ########################## NO WINNERS,  ATTEMPTS LOST ############################
+
+        if check_attempts_lost_number(general, user_tg_id):
+            print(
+                f'\n Attempts for {user_name} = 0 Game done !')
+
+            user_lost(general, user_tg_id)
+            drop_temp_table('game')
+            # one_game.drop(engine)
+            # REFRESH_game_table()
+
+
+            await message.answer(language_dict['unf']+
+                                 user_name +
+                                 language_dict['no att lost'] +
+                                 str(get_secret_number(general, user_tg_id)),
+                                 reply_markup=keyboard_after_fail)
+            time.sleep(1)
+
+    else:
+        await message.answer(text=language_dict['in game false'],
+                             reply_markup=keyboard1)
+
+
+@user_router.message()
+async def process_other_answers(message: Message):
+    user_tg_id = message.from_user.id
+    if not verify_that_user_into_general(general, user_tg_id):
+        await message.answer(language_dict['start chat'])
+    if verify_that_user_into_general(general, user_tg_id):
+        await message.answer(language_dict['wrong sent data'])
+    else:
+        if message.text == ('/start'):
+            await message.answer(language_dict['restart'])
+        else:
+            await message.answer(language_dict['silly bot'])

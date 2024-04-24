@@ -19,7 +19,7 @@ pre_start_button = KeyboardButton(text='/start')
 pre_start_clava = ReplyKeyboardMarkup(
     keyboard=[[pre_start_button]],
     resize_keyboard=True,
-    input_field_placeholder='Приятного чтения'
+    input_field_placeholder='Начнём игру ?'
 )
 
 
@@ -29,31 +29,24 @@ pre_start_clava = ReplyKeyboardMarkup(
 #Создаю кнопки
 start_button_1 = KeyboardButton(text='ДА')
 start_button_2 = KeyboardButton(text='НЕТ')
-att_button = KeyboardButton(text='Переустановить количество попыток')
-schet_button = KeyboardButton(text='Узнать Счёт')
+
 
 #  Создаю клавиатуру на согласие играть
 keyboard1 = ReplyKeyboardMarkup(
     keyboard=[[start_button_1, start_button_2]],
     resize_keyboard=True)
 
-#  создаю кнопки для установки количества попыток
-buttons_attempts: list[KeyboardButton] = [KeyboardButton(text=f'{i + 1}') for i in range(10)]
 
-#  создаю клавиатуру установки количества попыток
-keyboard_attempts = ReplyKeyboardMarkup(
-    keyboard=[buttons_attempts],
-    resize_keyboard=True)
 #  создаю клавитуру после проигрыша
 keyboard_after_fail = ReplyKeyboardMarkup(
-    keyboard=[[start_button_1, start_button_2],[att_button],[schet_button]],
+    keyboard=[[start_button_1, start_button_2]],
     resize_keyboard=True)
+
 #создаю клавиатуру с одной с кнопками Да и Узнать счет.
 keyboard_after_saying_NO = ReplyKeyboardMarkup(
-    keyboard=[[start_button_1], [schet_button]],
+    keyboard=[[start_button_1]],
     resize_keyboard=True)
 
 keyboard_for_help = ReplyKeyboardMarkup(
-                    keyboard=[[start_button_1, start_button_2],
-                              [att_button]],
+                    keyboard=[[start_button_1, start_button_2]],
                     resize_keyboard=True)

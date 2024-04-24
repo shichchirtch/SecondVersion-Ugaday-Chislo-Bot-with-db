@@ -4,10 +4,15 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from config import Config, load_config
-import user_handlers
+# import user_handlers
 import command_handlers
-from user_handlers import *
+import user_handlers
+from sqlalchemy import text
+
 from keyboards import set_main_menu
+# from sqlalchemy import (MetaData, Table, Column,
+#                         Integer, String, Text, ForeignKey, create_engine, insert, select, values, text)
+# import sqlalchemy as db
 
 # Инициализируем логгер
 # logger = logging.getLogger(__name__)
@@ -26,6 +31,8 @@ async def main():
 
     # Загружаем конфиг в переменную config
     config: Config = load_config()
+
+
 
     # Инициализируем бот и диспетчер
     bot = Bot(token=config.tg_bot.token,
