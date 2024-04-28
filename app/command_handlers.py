@@ -13,6 +13,11 @@ from external_functions import (insert_new_user_in_general_table, verify_that_us
 # Инициализируем роутер уровня модуля
 command_router = Router()
 
+@command_router.message()
+async def start_command(message: Message):
+    await message.reply("Привет мир!")
+
+
 @command_router.message(CommandStart())
 async def process_start_command(message: Message):
     # Логируем старт Бота

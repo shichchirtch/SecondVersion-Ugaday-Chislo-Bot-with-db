@@ -1,24 +1,24 @@
 from sqlalchemy import MetaData, Table, Column, Integer, text, insert
-from bot_base import engine, metadata, manipulator, One_game, General
+from bot_base import session_maker, One_game, General
 import sqlalchemy as db
 
 # conn = engine.connect()
 # metadata = MetaData()
-def INSERT_IN_GAME_TABLE(user_tg_id: int):
-
-    with manipulator() as conn:
-        needed_data = conn.query(One_game).filter(One_game.id == user_tg_id).first()
-        print('needed data = ', needed_data)
-        #user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.index'))
-        FK = conn.query(General.index).filter(General.id == user_tg_id).scalar()
-        print('\n\n\nFR  =  ', FK)
-        if not needed_data:
-            new_gamer = One_game(id=user_tg_id, us_number=245678, user_id = FK)
-            conn.add(new_gamer)
-            conn.commit()
-        else:
-            needed_data.us_number = 0
-            conn.commit()
+async def INSERT_IN_GAME_TABLE(user_tg_id: int):
+    pass
+    # async with session_maker() as session:
+    #     needed_data = session.query(One_game).filter(One_game.id == user_tg_id).first()
+    #     print('needed data = ', needed_data)
+    #     #user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.index'))
+    #     FK = session.query(General.index).filter(General.id == user_tg_id).scalar()
+    #     print('\n\n\nFR  =  ', FK)
+    #     if not needed_data:
+    #         new_gamer = One_game(id=user_tg_id, us_number=245678, user_id = FK)
+    #         session.add(new_gamer)
+    #         session.commit()
+    #     else:
+    #         needed_data.us_number = 0
+    #         session.commit()
     # one_game1 = Table('game', metadata,
     #                   Column('index', Integer(), primary_key=True, autoincrement=True),
     #                   Column('id', Integer()),

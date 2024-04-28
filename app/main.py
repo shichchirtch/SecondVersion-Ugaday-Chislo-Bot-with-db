@@ -3,24 +3,16 @@ import logging
 
 
 from aiogram import Bot, Dispatcher
-from config import Config, load_config
 import user_handlers
 import command_handlers
-# import user_handlers
-from sqlalchemy import text
-# from bot_base import engine, metadata
+from bot_base import init_models
 
 from keyboards import set_main_menu
-# from sqlalchemy import (MetaData, Table, Column,
-#                         Integer, String, Text, ForeignKey, create_engine, insert, select, values, text)
-# import sqlalchemy as db
-
-# Инициализируем логгер
-# logger = logging.getLogger(__name__)
 
 
 # Функция конфигурирования и запуска бота
 async def main():
+    await init_models()
     # Конфигурируем логирование
     # logging.basicConfig(
     #     level=logging.INFO,
@@ -31,12 +23,12 @@ async def main():
     # logger.info('Starting bot')
 
     # Загружаем конфиг в переменную config
-    config: Config = load_config()
+    # config: Config = load_config()
 
 
 
     # Инициализируем бот и диспетчер
-    bot = Bot(token=config.tg_bot.token,
+    bot = Bot(token="6850109769:AAF7H94Jn5TmMhPQwmDqgXId2Ik_MQT4sIM",
               parse_mode='HTML')
     dp = Dispatcher()
 

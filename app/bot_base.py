@@ -1,25 +1,20 @@
-from sqlalchemy import (MetaData, Table, Column,
-                        Boolean, TIMESTAMP, create_engine, Integer, String, ForeignKey)
-from sqlalchemy.orm import declarative_base, relationship, DeclarativeBase, sessionmaker, Mapped, mapped_column
-from sqlalchemy.types import Numeric, SmallInteger, DateTime
-from typing import Optional
-from datetime import datetime
+from sqlalchemy import (Integer, String, ForeignKey)
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import relationship, DeclarativeBase, sessionmaker, Mapped, mapped_column
+from config import settings
 
-import sqlalchemy as db
 
-# engine = create_engine('sqlite:///Bot_DB3.db', echo=True)
-#
-# conn = engine.connect()
-# metadata = MetaData()
-engine = create_engine("sqlite:///bot_map.db", echo=True, future=True)
-# Base.metadata.drop_all(engine)
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    echo=True,
+)
 
-# Base.metadata.create_all(engine)
+session_maker = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 
-manipulator = sessionmaker(engine, future=True)
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
+
 metadata = Base.metadata
-# metadata.drop_all(engine)
 class General(Base):
     __tablename__ = 'users'
     index: Mapped[int] = mapped_column(Integer, autoincrement=True, primary_key=True)
@@ -42,7 +37,10 @@ class One_game(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.index'))
 
 
-metadata.create_all(engine)
+async def init_models():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
 
 # Column('index', Integer(), primary_key=True, autoincrement=True),
 # Column('id', Integer()),  # tg user id

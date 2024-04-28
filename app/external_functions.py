@@ -1,42 +1,44 @@
-import sqlalchemy as db
-from sqlalchemy import insert
-from bot_base import manipulator, General
+from bot_base import session_maker, General
 from random import randint
 
 
-def insert_new_user_in_general_table(user_tg_id: int, name: str):
-    with manipulator() as conn:
-        needed_data = conn.query(General).filter(General.id == user_tg_id).first()
-        if not needed_data:
-            new_us = General(id=user_tg_id, user_name=name)
-            conn.add(new_us)
-            conn.commit()
-        else:
-            needed_data.wins = needed_data.total_games = needed_data.secret_number = needed_data.in_game = 0
-            needed_data.attempts = 5
-            conn.commit()
+async def insert_new_user_in_general_table(user_tg_id: int, name: str):
+    pass
+    # async with session_maker() as session:
+    #     needed_data = session.query(General).filter(General.id == user_tg_id).first()
+    #     if not needed_data:
+    #         new_us = General(id=user_tg_id, user_name=name)
+    #         session.add(new_us)
+    #         session.commit()
+    #     else:
+    #         needed_data.wins = needed_data.total_games = needed_data.secret_number = needed_data.in_game = 0
+    #         needed_data.attempts = 5
+    #         session.commit()
 
 
-def verify_that_user_into_general(user_tg_id: int):
-    with manipulator() as conn:
-        needed_data = conn.query(General).filter(General.id == user_tg_id).first()
-    return needed_data
+async def verify_that_user_into_general(user_tg_id: int):
+    pass
+    # async with session_maker() as session:
+    #     needed_data = session.query(General).filter(General.id == user_tg_id).first()
+    # return needed_data
 
 #
-def verify_INGAME_status( user_tg_id: int):
-    with manipulator() as conn:
-        needed_data = conn.query(General.in_game).filter(General.id == user_tg_id).scalar()
-    return needed_data
+async def verify_INGAME_status( user_tg_id: int):
+    pass
+    # async with session_maker() as session:
+    #     needed_data = session.query(General.in_game).filter(General.id == user_tg_id).scalar()
+    # return needed_data
     # temp_data = db.select(table.columns.in_game).where(table.columns.id == user_tg_id)
     # select_all_results = conn.execute(temp_data)
     # return select_all_results.scalar()
 #
 #
-def cancel_update(user_tg_id: int):
-    with manipulator() as conn:
-        needed_data = conn.query(General).filter(General.id == user_tg_id).first()
-        needed_data.in_game = 0
-        conn.commit()
+async def cancel_update(user_tg_id: int):
+    pass
+    # async with session_maker() as session:
+    #     needed_data = session.query(General).filter(General.id == user_tg_id).first()
+    #     needed_data.in_game = 0
+    #     session.commit()
 
 
 
@@ -45,12 +47,13 @@ def cancel_update(user_tg_id: int):
 #     conn.commit()
 # #
 #
-def choosing_number(user_tg_id: int):
-    with manipulator() as conn:
-        needed_data = conn.query(General).filter(General.id == user_tg_id).first()
-        needed_data.in_game = 1
-        needed_data.secret_number=randint(1, 100)
-        conn.commit()
+async def choosing_number(user_tg_id: int):
+    pass
+    # async with session_maker() as session:
+    #     needed_data = session.query(General).filter(General.id == user_tg_id).first()
+    #     needed_data.in_game = 1
+    #     needed_data.secret_number=randint(1, 100)
+    #     session.commit()
 
     # update_query = (db.update(table).where(table.columns.id == user_tg_id).values(in_game=1,
     #                                                                               secret_number=randint(1, 100)))
