@@ -1,45 +1,51 @@
 from sqlalchemy import MetaData, Table, Column, Integer, text, insert
-from bot_base import engine, metadata
+from bot_base import engine, metadata, manipulator, One_game, General
 import sqlalchemy as db
 
-conn = engine.connect()
+# conn = engine.connect()
 # metadata = MetaData()
+def INSERT_IN_GAME_TABLE(user_tg_id: int):
 
-def insert_user_number_in_one_game_table(table: db.Table, user_tg_id: int, number:int):
-    insertion_query = insert(table).values(id=user_tg_id, us_number=number)
-    conn.execute(insertion_query)
-    conn.commit()
+    with manipulator() as conn:
+        needed_data = conn.query(One_game).filter(One_game.id == user_tg_id).first()
+        print('needed data = ', needed_data)
+        #user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.index'))
+        FK = conn.query(General.index).filter(General.id == user_tg_id).scalar()
+        print('\n\n\nFR  =  ', FK)
+        if not needed_data:
+            new_gamer = One_game(id=user_tg_id, us_number=245678, user_id = FK)
+            conn.add(new_gamer)
+            conn.commit()
+        else:
+            needed_data.us_number = 0
+            conn.commit()
+    # one_game1 = Table('game', metadata,
+    #                   Column('index', Integer(), primary_key=True, autoincrement=True),
+    #                   Column('id', Integer()),
+    #                   Column('us_number', Integer(), nullable=False),
+    #                   extend_existing=True)
+    # metadata.create_all(engine)
+# def insert_user_number_in_one_game_table(table: db.Table, user_tg_id: int, number:int):
+#     insertion_query = insert(table).values(id=user_tg_id, us_number=number)
+#     conn.execute(insertion_query)
+#     conn.commit()
+#
+#
+# def drop_temp_table(table_name: str) -> None:
+#     sql = text(f'DROP TABLE IF EXISTS {table_name};')
+#     conn.execute(sql)
+#     conn.commit()
+#
+#
+# def check_user_number(table: db.Table, nuber_from_message: int):
+#     select_query = db.select(table.columns.us_number)
+#     select_results = conn.execute(select_query)
+#     needed_data_from_first_table = select_results.fetchall()
+#     tuple_number = (nuber_from_message,)
+#     return tuple_number in needed_data_from_first_table
 
 
-def drop_temp_table(table_name: str) -> None:
-    sql = text(f'DROP TABLE IF EXISTS {table_name};')
-    conn.execute(sql)
-    conn.commit()
 
-
-def check_user_number(table: db.Table, nuber_from_message: int):
-    select_query = db.select(table.columns.us_number)
-    select_results = conn.execute(select_query)
-    needed_data_from_first_table = select_results.fetchall()
-    tuple_number = (nuber_from_message,)
-    return tuple_number in needed_data_from_first_table
-
-
-def INSERT_IN_GAME_TABLE(table: db.Table, user_tg_id: int):
-    print('\n\n\n\n\nINSERT_IN_GAME_TABLE works', )
-    sql = text(f'DROP TABLE IF EXISTS game;')
-    conn.execute(sql)
-    conn.commit()
-    # sql = text(f'CREATE TABLE game')
-    # conn.execute(sql)
-    # conn.commit()
-    print('*********************************')
-    one_game1 = Table('game', metadata,
-                      Column('index', Integer(), primary_key=True, autoincrement=True),
-                      Column('id', Integer()),
-                      Column('us_number', Integer(), nullable=False),
-                      extend_existing=True)
-    metadata.create_all(engine)
     # temp_data = db.select(table).where(table.columns.id == user_tg_id)
     # select_all_results = conn.execute(temp_data)
     # needed_data = select_all_results.one_or_none()
@@ -73,16 +79,16 @@ def INSERT_IN_GAME_TABLE(table: db.Table, user_tg_id: int):
     #     #     us_number INTEGER NOT NULL)''')
     #     # conn.execute(new_table)
     #     # conn.commit()
-    return one_game1
-
-
-def REFRESH_game_table():
-    print('REFRESH works')
-    # table.drop(engine)
-    sql = text(f'DROP TABLE IF EXISTS game;')
-    conn.execute(sql)
-    conn.commit()
-    print('SQL works\n\n\n')
+#     return one_game1
+#
+#
+# def REFRESH_game_table():
+#     print('REFRESH works')
+#     # table.drop(engine)
+#     sql = text(f'DROP TABLE IF EXISTS game;')
+#     conn.execute(sql)
+#     conn.commit()
+#     print('SQL works\n\n\n')
     # new_table = text('''
     # CREATE TABLE IF NOT EXISTS game (
     # index INTEGER PRIMARY KEY,

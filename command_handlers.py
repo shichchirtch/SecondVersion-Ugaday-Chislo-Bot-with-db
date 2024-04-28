@@ -4,11 +4,11 @@ from keyboards import *
 from lexicon import start_greeding, language_dict
 from aiogram.types import Message
 
-from bot_base import general
-from external_functions import (insert_new_user_in_ganeral_table, verify_that_user_into_general,
+from bot_base import General
+from external_functions import (insert_new_user_in_general_table, verify_that_user_into_general,
                                 verify_INGAME_status, cancel_update)
 
-from temp_table import drop_temp_table
+# from temp_table import drop_temp_table
 
 # Инициализируем роутер уровня модуля
 command_router = Router()
@@ -19,7 +19,7 @@ async def process_start_command(message: Message):
     print(f'user {message.chat.first_name} press start')
     user_name = message.chat.first_name
     user_tg_id = message.from_user.id
-    insert_new_user_in_ganeral_table(general, user_tg_id, user_name)
+    insert_new_user_in_general_table(user_tg_id, user_name)
     await message.answer(
         f'Привет, {message.chat.first_name} !  \U0001F60A\n {start_greeding}',
                     reply_markup=keyboard1)
@@ -30,7 +30,7 @@ async def process_start_command(message: Message):
 async def process_help_command(message: Message):
     user_tg_id = message.from_user.id
     user_name = message.chat.first_name
-    if verify_that_user_into_general(general, user_tg_id):
+    if verify_that_user_into_general(user_tg_id):
         await message.answer(text=language_dict['game rules']+ user_name + language_dict['start ?'],
                              reply_markup=keyboard_for_help)
     else:
@@ -40,10 +40,10 @@ async def process_help_command(message: Message):
 @command_router.message(Command(commands='cancel'))
 async def process_cancel_command(message: Message):
     user_tg_id = message.from_user.id
-    if verify_that_user_into_general(general, user_tg_id):
-        if verify_INGAME_status(general, user_tg_id):
-            cancel_update(general, user_tg_id)
-            drop_temp_table('game')
+    if verify_that_user_into_general(user_tg_id):
+        if verify_INGAME_status(user_tg_id):
+            cancel_update(user_tg_id)
+            # drop_temp_table('game')
             await message.answer(language_dict['exit from game'],
                                  reply_markup=keyboard_after_saying_NO)
         else:

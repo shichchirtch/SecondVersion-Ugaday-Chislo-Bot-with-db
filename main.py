@@ -4,10 +4,11 @@ import logging
 
 from aiogram import Bot, Dispatcher
 from config import Config, load_config
-# import user_handlers
-import command_handlers
 import user_handlers
+import command_handlers
+# import user_handlers
 from sqlalchemy import text
+# from bot_base import engine, metadata
 
 from keyboards import set_main_menu
 # from sqlalchemy import (MetaData, Table, Column,
@@ -45,6 +46,7 @@ async def main():
     # Регистрируем роутеры в диспетчере
     dp.include_router(command_handlers.command_router)
     dp.include_router(user_handlers.user_router)
+    # metadata.drop_all(engine)
 
 
 
