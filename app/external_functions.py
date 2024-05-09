@@ -1,19 +1,14 @@
-from bot_base import session_maker, General
+from bot_base import session_maker, User
 from random import randint
 
 
-async def insert_new_user_in_general_table(user_tg_id: int, name: str):
-    pass
-    # async with session_maker() as session:
-    #     needed_data = session.query(General).filter(General.id == user_tg_id).first()
-    #     if not needed_data:
-    #         new_us = General(id=user_tg_id, user_name=name)
-    #         session.add(new_us)
-    #         session.commit()
-    #     else:
-    #         needed_data.wins = needed_data.total_games = needed_data.secret_number = needed_data.in_game = 0
-    #         needed_data.attempts = 5
-    #         session.commit()
+async def add_new_user(user_tg_id: int, name: str):
+    async with session_maker() as session:
+        needed_data = await session.get(User, user_tg_id)
+        if not needed_data:
+            new_us = User(id=user_tg_id, name=name)
+            session.add(new_us)
+            await session.commit()
 
 
 async def verify_that_user_into_general(user_tg_id: int):

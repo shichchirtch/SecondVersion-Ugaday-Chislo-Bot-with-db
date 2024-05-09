@@ -4,8 +4,8 @@ from keyboards import *
 from lexicon import start_greeding, language_dict
 from aiogram.types import Message
 
-from bot_base import General
-from external_functions import (insert_new_user_in_general_table, verify_that_user_into_general,
+# from bot_base import General
+from external_functions import (add_new_user, verify_that_user_into_general,
                                 verify_INGAME_status, cancel_update)
 
 # from temp_table import drop_temp_table
@@ -13,9 +13,9 @@ from external_functions import (insert_new_user_in_general_table, verify_that_us
 # Инициализируем роутер уровня модуля
 command_router = Router()
 
-@command_router.message()
-async def start_command(message: Message):
-    await message.reply("Привет мир!")
+# @command_router.message()
+# async def start_command(message: Message):
+#     await message.reply("Привет мир! Updated")
 
 
 @command_router.message(CommandStart())
@@ -24,9 +24,9 @@ async def process_start_command(message: Message):
     print(f'user {message.chat.first_name} press start')
     user_name = message.chat.first_name
     user_tg_id = message.from_user.id
-    insert_new_user_in_general_table(user_tg_id, user_name)
+    await add_new_user(user_tg_id, user_name)
     await message.answer(
-        f'Привет, {message.chat.first_name} !  \U0001F60A\n {start_greeding}',
+        f'Привет, {message.chat.first_name} !  😝\n {start_greeding}',
                     reply_markup=keyboard1)
     print("Process finfshed")
 

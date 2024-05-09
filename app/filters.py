@@ -10,7 +10,7 @@ class DATA_IS_NOT_DIGIT(BaseFilter):
         return False
 
 class CHECK_GAME_STATUS(BaseFilter):
-    async  def __call__(self, table: db.Table):
+    async  def __call__(self, message:Message):
 
         if not message.text.isdigit():
             return True
