@@ -14,7 +14,6 @@ session_maker = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=
 class Base(DeclarativeBase):
     pass
 
-metadata = Base.metadata
 
 class User(Base):
     __tablename__ = 'users'
@@ -26,7 +25,7 @@ class User(Base):
 
 
 class Game(Base):
-    __tablename__ = 'game'
+    __tablename__ = 'games'
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
